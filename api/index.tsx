@@ -3,6 +3,7 @@ import { devtools } from 'frog/dev'
 import { serveStatic } from 'frog/serve-static'
 import { neynar } from 'frog/hubs'
 import { handle } from 'frog/vercel'
+import { sql } from '@vercel/postgres'
 
 // Uncomment to use Edge Runtime.
 // export const config = {
@@ -15,8 +16,14 @@ export const app = new Frog({
   // Supply a Hub to enable frame verification.
   hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
+
+app.get('/db-read', async (c) => { 
+  const result = await sql`SELECT * FROM Likes`;
+  return c.json(result); 
+})
  
 app.frame('/', (c) => {
+  
   return c.res({
     image: (
       <div style={{ color: 'purple', display: 'flex', fontSize: 32, padding: 16 }}>
