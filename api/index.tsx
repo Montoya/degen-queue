@@ -5,11 +5,6 @@ import { neynar } from 'frog/hubs'
 import { handle } from 'frog/vercel'
 import { sql } from '@vercel/postgres'
 
-// Uncomment to use Edge Runtime.
-// export const config = {
-//   runtime: 'edge',
-// }
-
 export const app = new Frog({
   assetsPath: '/',
   basePath: '/api',
@@ -31,7 +26,7 @@ app.frame('/', (c) => {
       </div>
     ),
     intents: [
-      <Button.AddCastAction action="/degen-queue">
+      <Button.AddCastAction action="/add-to-degen-queue">
         Add
       </Button.AddCastAction>,
     ]
@@ -39,20 +34,23 @@ app.frame('/', (c) => {
 })
  
 app.castAction(
-  '/degen-queue',
+  '/add-to-degen-queue',
   async (c) => {
     const { actionData } = c
     const { castId, fid, messageHash, network, timestamp, url } = actionData
     try { 
-      const result = await sql`INSERT INTO Likes (castId, fid, messageHash, network, timestamp, url) 
-        VALUES (${castId}, ${fid}, '${messageHash}', '${network}', '${timestamp}', '${url})`
-    } catch(error) { } 
-    return c.res({ type: 'frame', path: '/degen-queue-frame' })
+      app.post()
+      await sql`INSERT INTO Likes (fid, messageHash, network, timestamp, url, castAuthor, castHash) 
+        VALUES (${fid}, '${messageHash}', '${network}', '${timestamp}', '${url}', ${castId.fid}, '${castId.hash}')`
+    } catch(error) { 
+      return c.error({ message: `${error}` }); 
+    } 
+    return c.res({ type: 'frame', path: '/degen-queue-frame-response' })
   },
-  { name: "Degen Queue", icon: "plus" }
+  { name: "Add to Degen Queue", icon: "plus" }
 )
 
-app.frame('/degen-queue-frame', async (c) => {
+app.frame('/degen-queue-frame-response', async (c) => {
   try { 
     let viewer = c.frameData?.fid
     const result = await sql`SELECT COUNT(url) FROM Likes WHERE fid=${viewer}`
@@ -68,7 +66,7 @@ app.frame('/degen-queue-frame', async (c) => {
     return c.res({
       image: (
         <div style={{ color: 'purple', display: 'flex', fontSize: 60 }}>
-          User not found...
+          ${error}
         </div>
       )
     })
