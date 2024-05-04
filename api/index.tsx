@@ -40,20 +40,39 @@ app.frame('/', (c) => {
  
 app.castAction(
   '/degen-queue',
-  (c) => {
+  async (c) => {
+    const { actionData } = c
+    const { castId, fid, messageHash, network, timestamp, url } = actionData
+    try { 
+      const result = await sql`INSERT INTO Likes (castId, fid, messageHash, network, timestamp, url) 
+        VALUES (${castId}, ${fid}, '${messageHash}', '${network}', '${timestamp}', '${url})`
+    } catch(error) { } 
     return c.res({ type: 'frame', path: '/degen-queue-frame' })
   },
-  { name: "Degen Queue", icon: "smiley" }
+  { name: "Degen Queue", icon: "plus" }
 )
- 
-app.frame('/degen-queue-frame', (c) => {
-  return c.res({
-    image: (
-      <div style={{ color: 'purple', display: 'flex', fontSize: 60 }}>
-        Hello, I'm the Degen Queue Frame!
-      </div>
-    )
-  })
+
+app.frame('/degen-queue-frame', async (c) => {
+  try { 
+    let viewer = c.frameData?.fid
+    const result = await sql`SELECT COUNT(url) FROM Likes WHERE fid=${viewer}`
+    return c.res({
+      image: (
+        <div style={{ color: 'purple', display: 'flex', fontSize: 60 }}>
+          ${result}
+        </div>
+      )
+    })
+  }
+  catch (error) { 
+    return c.res({
+      image: (
+        <div style={{ color: 'purple', display: 'flex', fontSize: 60 }}>
+          User not found...
+        </div>
+      )
+    })
+  }
 })
 
 /*
