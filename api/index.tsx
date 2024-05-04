@@ -1,4 +1,4 @@
-import { Button, Frog, TextInput } from 'frog'
+import { Button, Frog } from 'frog'
 import { devtools } from 'frog/dev'
 import { serveStatic } from 'frog/serve-static'
 import { neynar } from 'frog/hubs'
@@ -15,7 +15,41 @@ export const app = new Frog({
   // Supply a Hub to enable frame verification.
   hub: neynar({ apiKey: 'NEYNAR_FROG_FM' })
 })
+ 
+app.frame('/', (c) => {
+  return c.res({
+    image: (
+      <div style={{ color: 'purple', display: 'flex', fontSize: 32, padding: 16 }}>
+        Add "Degen Queue" Action
+      </div>
+    ),
+    intents: [
+      <Button.AddCastAction action="/degen-queue">
+        Add
+      </Button.AddCastAction>,
+    ]
+  })
+})
+ 
+app.castAction(
+  '/degen-queue',
+  (c) => {
+    return c.res({ type: 'frame', path: '/degen-queue-frame' })
+  },
+  { name: "Degen Queue", icon: "smiley" }
+)
+ 
+app.frame('/degen-queue-frame', (c) => {
+  return c.res({
+    image: (
+      <div style={{ color: 'purple', display: 'flex', fontSize: 60 }}>
+        Hello, I'm the Degen Queue Frame!
+      </div>
+    )
+  })
+})
 
+/*
 app.frame('/', (c) => {
   const { buttonValue, inputText, status } = c
   const fruit = inputText || buttonValue
@@ -64,7 +98,7 @@ app.frame('/', (c) => {
       status === 'response' && <Button.Reset>Reset</Button.Reset>,
     ],
   })
-})
+}) */
 
 // @ts-ignore
 const isEdgeFunction = typeof EdgeFunction !== 'undefined'
