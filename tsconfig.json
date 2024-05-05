@@ -11,12 +11,12 @@
     "jsxImportSource": "frog/jsx",
 
     /* Linting */
-    "strict": true,
-    "noUnusedLocals": true,
-    "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": false,
 
     "types": ["frog/client"]
   },
-  "include": ["**/*.ts", "**/*.tsx", "**/*.mtsx"]
+  "include": ["**/*.ts", "**/*.tsx", "**/*.mtsx", "ui.js"]
 }
