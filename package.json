@@ -5,12 +5,17 @@
   "scripts": {
     "build": "frog vercel-build",
     "dev": "frog dev",
-    "deploy": "vercel"
+    "deploy": "vercel",
+    "postinstall": "prisma generate"
   },
   "dependencies": {
+    "@neynar/nodejs-sdk": "^1.21.2",
+    "@prisma/client": "^5.13.0",
     "@vercel/postgres": "^0.8.0",
+    "dotenv": "^16.4.5",
     "frog": "latest",
-    "hono": "^4"
+    "hono": "^4",
+    "prisma": "^5.13.0"
   },
   "devDependencies": {
     "tsx": "^4.7.1",

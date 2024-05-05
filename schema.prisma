@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+ 
+datasource db {
+  provider = "postgresql"
+  // Uses connection pooling
+  url = env("POSTGRES_PRISMA_URL")
+  // Uses direct connection, ⚠️ make sure to keep this to `POSTGRES_URL_NON_POOLING`
+  // or you'll have dangling databases from migrations
+  directUrl = env("POSTGRES_URL_NON_POOLING")
+}
+ 
+model Likes {
+  fid           Int 
+  messageHash   String 
+  network       String 
+  timestamp     String 
+  url           String 
+  castAuthor    Int 
+  castHash      String 
+  createdAt     DateTime     @default(now())
+  @@id([fid, castAuthor, castHash])
+}
