@@ -6,8 +6,15 @@ import { serveStatic } from 'frog/serve-static'
 import { neynar } from 'frog/hubs'
 import { handle } from 'frog/vercel'
 import { PrismaClient } from '@prisma/client';
+import { NeynarAPIClient } from '@neynar/nodejs-sdk'
 
 const prisma = new PrismaClient();
+
+if (!process.env.NEYNAR_API_KEY) {
+  throw new Error("Make sure you set NEYNAR_API_KEY in your .env file");
+}
+
+const neynarClient = new NeynarAPIClient(process.env.NEYNAR_API_KEY);
 
 export const app = new Frog({
   assetsPath: '/',
@@ -51,11 +58,29 @@ app.get('/queue/:fid', async (c) => {
         }
       }
     })
+
+    // fetch all the user data we need 
+    const authorIds:Array<number> = []
+    // fetch all the cast data we need 
+    const castHashes:Array<string> = []
+    rows.map((row:any) => {
+      if(!authorIds.includes(row['castAuthor'])) { 
+        authorIds.push(row['castAuthor'])
+      }
+      castHashes.push(row['castHash'])
+    })
+
+    const authorResponse = await neynarClient.fetchBulkUsers(authorIds);
+    const authors = authorResponse.users; 
+
+    const casts = await neynarClient.fetchBulkCasts(castHashes); 
+
     return c.html(
       <html>
         <head>
           <title>Your $DEGEN Queue</title>
           <link rel="stylesheet" href="https://unpkg.com/spectre.css/dist/spectre.min.css"/>
+          <link rel="stylesheet" href="/styles.css"/>
         </head>
         <body>
           <h1>Your $DEGEN Queue</h1>
@@ -64,7 +89,7 @@ app.get('/queue/:fid', async (c) => {
           <p>{rows.length} casts in your queue:</p>
           {rows.length > 0 &&
             <table>
-              {rows.map((row:any, index:Number) => (
+              {rows.map((row:any, index:number) => (
                 <tr key={index}>
                   <td>{row['castAuthor']}</td>
                   <td>{row['castHash']}</td>
@@ -75,7 +100,8 @@ app.get('/queue/:fid', async (c) => {
           {rows.length < 1 && 
             <p><em>Add some casts to get started!</em></p>
           }
-          <table></table>
+          <p>{JSON.stringify(authors)}</p>
+          <p>{JSON.stringify(casts)}</p>
         </body>
       </html>
     )
