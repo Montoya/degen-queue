@@ -141,6 +141,8 @@ app.get('/queue/:fid', async (c) => {
             {casts.length < 1 && 
               <p><em>Add some casts to get started!</em></p>
             }
+            <p>Built by <a href="https://warpcast.com/m0nt0y4" target="_blank">@m0nt0y4</a> and <a href="https://warpcast.com/jcqln" target="_blank">@jcqln</a> for FarHack 2024
+            </p>
           </div>
         </body>
       </html>

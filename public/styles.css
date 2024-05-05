@@ -5,7 +5,7 @@ body {
   font-size:16px; 
 }
 #page { 
-  width:760px; 
+  width:600px; 
   margin:36px auto; 
 }
 a, a:link { 
@@ -16,6 +16,7 @@ a:hover {
 }
 table { 
   border-collapse:collapse;
+  margin-bottom:2em !important;
 }
 th { 
   text-align:left;
